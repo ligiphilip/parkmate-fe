@@ -63,11 +63,20 @@ export default function LoginScreen() {
   };
 
   // Theme colors
-  const isDark = theme === 'dark';
-  const bgColor = isDark ? '#121212' : '#f2f2f2';
-  const cardBg = isDark ? '#1e1e1e' : '#fff';
-  const textColor = isDark ? '#fff' : '#000';
-  const borderColor = isDark ? '#444' : '#ccc';
+  // Qodo color theme
+  const qodoPrimary = '#6C38FF'; // electric purple
+  const qodoSecondary = '#00D1FF'; // bright cyan
+  const qodoBg = '#181A20'; // deep dark
+  const qodoCard = '#23263A'; // slightly lighter dark
+  const qodoAccent = '#FFB300'; // vivid yellow
+  const qodoText = '#FFFFFF'; // white
+  const qodoTextSecondary = '#B0B3C7'; // soft light gray
+
+  const isDark = true; // Force qodo theme for now
+  const bgColor = qodoBg;
+  const cardBg = qodoCard;
+  const textColor = qodoText;
+  const borderColor = qodoSecondary;
 
   // 🔼 Set theme toggle button in header
   useLayoutEffect(() => {
@@ -84,6 +93,12 @@ export default function LoginScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgColor }]}>
       <View style={styles.container}>
         <View style={[styles.card, { backgroundColor: cardBg }]}>
+          <Text style={{ color: textColor, fontSize: 18, marginBottom: 8, textAlign: 'center' }}>
+            👋 Welcome! Let's get you started.
+          </Text>
+          <Text style={{ color: textColor, fontSize: 14, marginBottom: 16, textAlign: 'center' }}>
+            Please enter your mobile number to continue. Your privacy is important to us.
+          </Text>
           <Text style={[styles.heading, { color: textColor }]}>Enter Mobile Number</Text>
           <TextInput
             placeholder="Enter 10-digit number"
@@ -122,29 +137,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: 320,
-    padding: 24,
-    borderRadius: 16,
+    width: '100%',
+    maxWidth: 400, // Tab width
+    paddingVertical: 48,
+    paddingHorizontal: 36,
+    borderRadius: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 16,
+    elevation: 12,
+    alignSelf: 'center',
+    justifyContent: 'center',
   },
   heading: {
-    fontSize: 16,
-    marginBottom: 12,
-    fontWeight: '600',
+    fontSize: 20,
+    marginBottom: 18,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    marginBottom: 18,
+    borderRadius: 10,
+    fontSize: 18,
   },
   errorText: {
     color: 'red',
-    marginBottom: 10,
-    fontSize: 12,
+    marginBottom: 14,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

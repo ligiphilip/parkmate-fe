@@ -37,7 +37,8 @@ export default function VerifyScreen() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json(); 
+    
 
       if (!response.ok) {
   
@@ -59,8 +60,11 @@ export default function VerifyScreen() {
       text1: 'OTP verified!',
       text2: data.message || 'OTP verified!',
     });
-      router.replace('/ProfileCreation');
-      setOtp('');
+
+    // Navigate to categories select page after successful OTP
+    router.replace('/CategoriesSelect');
+
+    setOtp('');
  
     } catch (err) {
       console.error('OTP verification error:', err);
@@ -72,6 +76,9 @@ export default function VerifyScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgColor }]}>
         <View style={styles.container}>
             <View style={[styles.card, { backgroundColor: cardBg }]}>
+                <Text style={{ color: textColor, fontSize: 16, marginBottom: 8, textAlign: 'center' }}>
+                  🔒 For your security, we've sent a 6-digit code to your mobile. Please enter it below to verify your identity.
+                </Text>
                 <Text style={{ color: textColor }}>Enter OTP sent to {phoneNumber}</Text>
                 <TextInput
                   placeholder="OTP"
