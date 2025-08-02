@@ -64,14 +64,11 @@ export default function LoginScreen() {
 
   // Theme colors
   // Qodo color theme
-  const qodoPrimary = '#6C38FF'; // electric purple
-  const qodoSecondary = '#00D1FF'; // bright cyan
-  const qodoBg = '#181A20'; // deep dark
-  const qodoCard = '#23263A'; // slightly lighter dark
-  const qodoAccent = '#FFB300'; // vivid yellow
-  const qodoText = '#FFFFFF'; // white
-  const qodoTextSecondary = '#B0B3C7'; // soft light gray
-
+   const qodoSecondary = '#071467ff'; // bright cyan
+  const qodoBg = '#071467ff'; // deep dark
+  const qodoCard = '#071467ff'; // slightly lighter dark
+   const qodoText = '#FFFFFF'; // white
+ 
   const isDark = true; // Force qodo theme for now
   const bgColor = qodoBg;
   const cardBg = qodoCard;
@@ -129,7 +126,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#023782ff',
   },
   container: {
     flex: 1,
@@ -139,13 +136,13 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 400, // Tab width
-    paddingVertical: 48,
+    paddingVertical: 100,
     paddingHorizontal: 36,
-    borderRadius: 24,
+    borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 16,
+    shadowRadius: 5,
     elevation: 12,
     alignSelf: 'center',
     justifyContent: 'center',

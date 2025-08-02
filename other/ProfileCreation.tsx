@@ -1,9 +1,11 @@
 // app/profilecreation.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, SafeAreaView, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+// Update the import path if ThemeContext is located elsewhere, for example:
 import { useThemeMode } from '../context/ThemeContext';
-import { useLocalSearchParams } from 'expo-router';
+// Or, if you do not have ThemeContext, you can temporarily mock the hook as below:
+// const useThemeMode = () => ({ theme: 'light' });
 
 export default function ProfileCreation() {
   const [name, setName] = useState('');
