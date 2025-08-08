@@ -64,9 +64,9 @@ export default function LoginScreen() {
 
   // Theme colors
   // Qodo color theme
-   const qodoSecondary = '#071467ff'; // bright cyan
-  const qodoBg = '#071467ff'; // deep dark
-  const qodoCard = '#071467ff'; // slightly lighter dark
+   const qodoSecondary = '#43AA8B'; // bright cyan
+  const qodoBg = '#43AA8B'; // deep dark
+  const qodoCard = '#43AA8B'; // slightly lighter dark
    const qodoText = '#FFFFFF'; // white
  
   const isDark = true; // Force qodo theme for now
@@ -126,7 +126,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#023782ff',
+    backgroundColor: '#43AA8B',
   },
   container: {
     flex: 1,
