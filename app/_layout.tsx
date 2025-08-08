@@ -1,22 +1,22 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const tabIcon = (icon: string) => ({ color }: { color: string }) => (
-  <Text style={{ color, fontSize: 20 }}>{icon}</Text>
+const tabIcon = (iconName: string) => ({ color }: { color: string }) => (
+  <Ionicons name={iconName} size={22} color={color} />
 );
 
 export default function Layout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#007bff',
-        tabBarInactiveTintColor: '#888',
+        tabBarActiveTintColor: '#363636ff',
+        tabBarInactiveTintColor: 'rgba(199, 199, 199, 1)',
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderColor: '#ddd',
+          backgroundColor: '#43AA8B',
+          borderTopWidth: 0,
+          borderColor: '#4D908E',
         },
       }}
     >
@@ -24,7 +24,7 @@ export default function Layout() {
         name="main/index"
         options={{
           title: 'Home',
-          tabBarIcon: tabIcon('🏠'),
+          tabBarIcon: tabIcon('home'),
           tabBarAccessibilityLabel: 'Home Tab',
         }}
       />
@@ -32,7 +32,7 @@ export default function Layout() {
         name="main/shopsearch"
         options={{
           title: 'Shop Search',
-          tabBarIcon: tabIcon('🛒'),
+          tabBarIcon: tabIcon('search'),
           tabBarAccessibilityLabel: 'Shop Search Tab',
         }}
       />
@@ -40,7 +40,7 @@ export default function Layout() {
         name="main/favorites"
         options={{
           title: 'Favorites',
-          tabBarIcon: tabIcon('❤️'),
+          tabBarIcon: tabIcon('heart'),
           tabBarAccessibilityLabel: 'Favorites Tab',
         }}
       />
@@ -48,7 +48,7 @@ export default function Layout() {
         name="main/bookings"
         options={{
           title: 'Bookings',
-          tabBarIcon: tabIcon('📝'),
+          tabBarIcon: tabIcon('document-text'),
           tabBarAccessibilityLabel: 'Bookings Tab',
         }}
       />
