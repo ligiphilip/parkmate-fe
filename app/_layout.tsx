@@ -1,3 +1,4 @@
+ 
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,7 +15,7 @@ export default function Layout() {
         tabBarInactiveTintColor: 'rgba(199, 199, 199, 1)',
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#43AA8B',
+          backgroundColor: 'rgba(67,170,139,1.00)',
           borderTopWidth: 0,
           borderColor: '#4D908E',
         },
@@ -52,6 +53,11 @@ export default function Layout() {
           tabBarAccessibilityLabel: 'Bookings Tab',
         }}
       />
+
+      <Tabs.Screen
+  name="main/shopdetails"
+  options={{ href: null }}
+/>
     </Tabs>
   );
 }

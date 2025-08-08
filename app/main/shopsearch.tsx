@@ -15,6 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
+import { Share } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -81,6 +82,21 @@ const MOCK_SHOPS = [
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function ShopSearch() {
+  // Share App logic
+  const shareApp = async () => {
+    try {
+      const result = await Share.share({
+        message:
+          'Check out ParkMate! Find the best shops and parking spots nearby. Download now: https://parkmate.app',
+        url: 'https://parkmate.app',
+        title: 'ParkMate App',
+      });
+      // Optionally handle result.action
+    } catch (error) {
+      alert('Could not share the app.');
+    }
+  };
+  const [menuVisible, setMenuVisible] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([] as typeof MOCK_SHOPS);
   const [modalVisible, setModalVisible] = useState(false);
@@ -89,6 +105,16 @@ export default function ShopSearch() {
   const [selectedDate, setSelectedDate] = useState<'today' | 'tomorrow' | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [searchActive, setSearchActive] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+  const [profileFirstName, setProfileFirstName] = useState('');
+  const [profileMiddleName, setProfileMiddleName] = useState('');
+  const [profileLastName, setProfileLastName] = useState('');
+  const [profileGender, setProfileGender] = useState('');
+  const [profileDOB, setProfileDOB] = useState('');
+  const [profileEmail, setProfileEmail] = useState('your@email.com');
   const searchAnim = useRef(new Animated.Value(0)).current; // 0=center, 1=top
   const router = useRouter();
 
@@ -120,7 +146,7 @@ export default function ShopSearch() {
   };
 
   const openShopDetails = (shop: typeof MOCK_SHOPS[0]) => {
-    router.push(`../other/shopdetails?id=${shop.id}`);
+    router.push(`main/shopdetails?id=${shop.id}`);
   };
 
   const openBookingModal = (shop: typeof MOCK_SHOPS[0]) => {
@@ -261,15 +287,300 @@ export default function ShopSearch() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Animated Search Box */}
+      {/* Side Menu Modal */}
+      <Modal
+        visible={menuVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <View style={styles.menuOverlay}>
+          <View style={styles.menuContainer}>
+            <TouchableOpacity style={styles.menuCloseBtn} onPress={() => setMenuVisible(false)}>
+              <Ionicons name="close" size={28} color={COLORS.primary} />
+            </TouchableOpacity>
+            <View style={styles.menuProfileSection}>
+              <Ionicons name="person-circle" size={64} color={COLORS.primary} />
+              <Text style={styles.menuProfileName}>Your Name</Text>
+            </View>
+            {/* Group 1: Account */}
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ fontWeight: 'bold', color: COLORS.grayText, fontSize: 13, marginBottom: 2, marginLeft: 2 }}>Account</Text>
+              <TouchableOpacity style={styles.menuItem} onPress={() => setEditProfileModalVisible(true)}>
+                <Ionicons name="create-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Edit Profile</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={() => alert('Logout')}>
+                <Ionicons name="log-out-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Logout</Text>
+              </TouchableOpacity>
+            </View>
+            {/* Divider */}
+            <View style={{ height: 1, backgroundColor: COLORS.cardBorder, marginVertical: 4 }} />
+            {/* Spacer before Delete Account */}
+            <View style={{ height: 32 }} />
+            {/* Group: App Info & Settings */}
+            <View>
+              <Text style={{ fontWeight: 'bold', color: COLORS.grayText, fontSize: 13, marginBottom: 2, marginLeft: 2 }}>App Info & Settings</Text>
+              {/* About Us menu item (single instance) */}
+              <TouchableOpacity style={styles.menuItem} onPress={() => setAboutModalVisible(true)}>
+                <Ionicons name="information-circle-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>About Us</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={shareApp}>
+                <Ionicons name="share-social-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Share App</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={() => setContactModalVisible(true)}>
+                <Ionicons name="call-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Contact Us</Text>
+              </TouchableOpacity>
+              {/* Dark Theme toggle with switch */}
+              <View style={[styles.menuItem, { borderBottomWidth: 0, paddingVertical: 8 }]}> 
+                <Ionicons name="moon-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Dark Theme</Text>
+                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                  <TouchableOpacity
+                    style={{
+                      width: 44,
+                      height: 24,
+                      borderRadius: 12,
+                      backgroundColor: '#E0E0E0',
+                      justifyContent: 'center',
+                      padding: 2,
+                    }}
+                    onPress={() => alert('Dark Theme toggled!')}
+                  >
+                    <Animated.View
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: 10,
+                        backgroundColor: COLORS.primary,
+                        transform: [{ translateX: 0 }],
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+            {/* Delete Account button at the very bottom */}
+            <View style={{ marginTop: 40 }}>
+              <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={() => setDeleteModalVisible(true)}>
+                <Ionicons name="trash-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Delete Account</Text>
+              </TouchableOpacity>
+            </View>
+      {/* Delete Account Confirmation Modal */}
+      <Modal
+        visible={deleteModalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { padding: 24, width: 300 }]}>  
+            <Ionicons name="warning-outline" size={48} color={COLORS.primary} style={{ marginBottom: 12 }} />
+            <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 10 }]}>Are you sure you want to delete your account?</Text>
+            <Text style={{ color: COLORS.grayText, textAlign: 'center', marginBottom: 18 }}>
+              This action cannot be undone. All your data will be permanently deleted.
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+              <TouchableOpacity
+                style={[styles.modalBtn, { flex: 1, marginRight: 8 }]}
+                onPress={() => setDeleteModalVisible(false)}
+              >
+                <Text style={styles.modalBtnText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnActive, { flex: 1, marginLeft: 8 }]}
+                onPress={() => {
+                  setDeleteModalVisible(false);
+                  setMenuVisible(false);
+                  alert('Account deleted! (Implement actual delete logic here)');
+                }}
+              >
+                <Text style={[styles.modalBtnText, { color: COLORS.white }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+            {/* Removed duplicate About Us menu item */}
+      {/* About Us Modal */}
+      <Modal
+        visible={aboutModalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setAboutModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { padding: 24, width: 300 }]}>  
+            <TouchableOpacity
+              style={{ position: 'absolute', top: 12, right: 12, zIndex: 2 }}
+              onPress={() => setAboutModalVisible(false)}
+            >
+              <Ionicons name="close" size={26} color={COLORS.primary} />
+            </TouchableOpacity>
+            <Ionicons name="information-circle-outline" size={48} color={COLORS.primary} style={{ marginBottom: 12, marginTop: 8 }} />
+            <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 10 }]}>About ParkMate</Text>
+            <Text style={{ color: COLORS.grayText, textAlign: 'center', marginBottom: 18 }}>
+              ParkMate helps you find the best shops and parking spots nearby. This is a demo app.{"\n\n"}Version 1.0.0{"\n\n"}© 2025 ParkMate Team
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Contact Us Modal */}
+      <Modal
+        visible={contactModalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setContactModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { padding: 24, width: 300 }]}>  
+            <TouchableOpacity
+              style={{ position: 'absolute', top: 12, right: 12, zIndex: 2 }}
+              onPress={() => setContactModalVisible(false)}
+            >
+              <Ionicons name="close" size={26} color={COLORS.primary} />
+            </TouchableOpacity>
+            <Ionicons name="call-outline" size={48} color={COLORS.primary} style={{ marginBottom: 12, marginTop: 8 }} />
+            <Text style={[styles.modalTitle, { textAlign: 'center', marginBottom: 10 }]}>Contact Us</Text>
+            <Text style={{ color: COLORS.grayText, textAlign: 'center', marginBottom: 18 }}>
+              For support or inquiries, call us at:
+              {"\n"}
+              <Text style={{ color: COLORS.primary, fontWeight: 'bold', fontSize: 16 }}>+91 98765 43210</Text>
+              {"\n\n"}Or email: support@parkmate.com
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        visible={editProfileModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setEditProfileModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { padding: 24, width: 320, alignItems: 'flex-start' }]}>  
+            <Ionicons name="person-circle-outline" size={48} color={COLORS.primary} style={{ marginBottom: 12, alignSelf: 'center' }} />
+            <Text style={[styles.modalTitle, { textAlign: 'left', marginBottom: 10, alignSelf: 'flex-start' }]}>Edit Profile</Text>
+            <View style={{ width: '100%' }}>
+              <Text style={{ color: COLORS.textInput, fontWeight: '600', marginBottom: 2 }}>First Name</Text>
+              <TextInput
+                style={[styles.inputFluid, { marginBottom: 10, borderRadius: 6 }]}
+                placeholder="First Name"
+                value={profileFirstName}
+                onChangeText={setProfileFirstName}
+                placeholderTextColor={COLORS.placeholder}
+              />
+              <Text style={{ color: COLORS.textInput, fontWeight: '600', marginBottom: 2 }}>Middle Name</Text>
+              <TextInput
+                style={[styles.inputFluid, { marginBottom: 10, borderRadius: 6 }]}
+                placeholder="Middle Name"
+                value={profileMiddleName}
+                onChangeText={setProfileMiddleName}
+                placeholderTextColor={COLORS.placeholder}
+              />
+              <Text style={{ color: COLORS.textInput, fontWeight: '600', marginBottom: 2 }}>Last Name</Text>
+              <TextInput
+                style={[styles.inputFluid, { marginBottom: 10, borderRadius: 6 }]}
+                placeholder="Last Name"
+                value={profileLastName}
+                onChangeText={setProfileLastName}
+                placeholderTextColor={COLORS.placeholder}
+              />
+              <Text style={{ color: COLORS.textInput, fontWeight: '600', marginBottom: 2 }}>Gender</Text>
+              <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+                {['Male', 'Female', 'Other'].map((g) => (
+                  <TouchableOpacity
+                    key={g}
+                    style={{
+                      backgroundColor: profileGender === g ? COLORS.primary : COLORS.modalBtnBg,
+                      borderColor: COLORS.border,
+                      borderWidth: 1,
+                      borderRadius: 8,
+                      paddingVertical: 8,
+                      paddingHorizontal: 16,
+                      marginRight: 8,
+                    }}
+                    onPress={() => setProfileGender(g)}
+                  >
+                    <Text style={{ color: profileGender === g ? COLORS.white : COLORS.textInput, fontWeight: '600' }}>{g}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={{ color: COLORS.textInput, fontWeight: '600', marginBottom: 2 }}>Date of Birth</Text>
+              <TextInput
+                style={[styles.inputFluid, { marginBottom: 10, borderRadius: 6 }]}
+                placeholder="YYYY-MM-DD"
+                value={profileDOB}
+                onChangeText={setProfileDOB}
+                placeholderTextColor={COLORS.placeholder}
+                keyboardType="numeric"
+                maxLength={10}
+              />
+              <Text style={{ color: COLORS.textInput, fontWeight: '600', marginBottom: 2 }}>Email</Text>
+              <TextInput
+                style={[styles.inputFluid, { marginBottom: 18, borderRadius: 6 }]}
+                placeholder="Email"
+                value={profileEmail}
+                onChangeText={setProfileEmail}
+                placeholderTextColor={COLORS.placeholder}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+              <TouchableOpacity
+                style={[
+                  styles.modalBtn,
+                  {
+                    flex: 1,
+                    marginRight: 8,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderColor: COLORS.border,
+                  },
+                ]}
+                onPress={() => setEditProfileModalVisible(false)}
+              >
+                <Ionicons name="close-circle-outline" size={20} color={COLORS.primary} style={{ marginRight: 6 }} />
+                <Text style={styles.modalBtnText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modalBtn,
+                  { flex: 1, marginLeft: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.primary },
+                ]}
+                onPress={() => setEditProfileModalVisible(false)}
+              >
+                <Ionicons name="save-outline" size={20} color={COLORS.white} style={{ marginRight: 6 }} />
+                <Text style={[styles.modalBtnText, { color: COLORS.white }]}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+             
+          </View>
+        </View>
+      </Modal>
+
+      {/* Top Row: Search Box and Profile Icon */}
       <Animated.View
         style={[
-          styles.animatedSearchBox,
+          styles.topRow,
           {
-            // Center vertically when inactive, move to below status bar when active
             top: searchAnim.interpolate({
               inputRange: [0, 1],
-              outputRange: [SCREEN_HEIGHT / 2 - 32, statusBarHeight + 16], // 32 is half the input height (approx), 16px below status bar
+              outputRange: [SCREEN_HEIGHT / 2 - 32, statusBarHeight + 16],
             }),
             transform: [
               {
@@ -282,16 +593,27 @@ export default function ShopSearch() {
           },
         ]}
       >
-        <TextInput
-          style={styles.inputFluid}
-          placeholder="Search shops, categories, or address..."
-          placeholderTextColor={COLORS.placeholder}
-          value={query}
-          onChangeText={handleSearch}
-          clearButtonMode="while-editing"
-          onFocus={() => setSearchActive(true)}
-        />
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.inputFluid}
+            placeholder="Search shops, categories, or address..."
+            placeholderTextColor={COLORS.placeholder}
+            value={query}
+            onChangeText={handleSearch}
+            clearButtonMode="while-editing"
+            onFocus={() => setSearchActive(true)}
+          />
+        </View>
       </Animated.View>
+
+      {/* Profile Icon - always top right */}
+      <TouchableOpacity
+        style={styles.profileIconFixed}
+        onPress={() => setMenuVisible(true)}
+        accessibilityLabel="Open profile menu"
+      >
+        <Ionicons name="person-circle" size={36} color={COLORS.primary} />
+      </TouchableOpacity>
 
       {/* Welcome Content (hide when searching) */}
       {!searchActive && (
@@ -405,6 +727,101 @@ const COLORS = {
 };
 
 const styles = StyleSheet.create({
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.modalBg,
+    borderRadius: 12,
+    borderWidth: 0,
+    borderColor: COLORS.border,
+    marginBottom: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  profileIconBtn: {
+    // No longer used
+  },
+  // profileIconFixed: { // No longer used },
+  topRow: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    marginHorizontal: 24,
+  },
+  inputRowWithProfile: {
+    // No longer used
+  },
+  profileIconInline: {
+    // No longer used
+  },
+  profileIconFixed: {
+    position: 'absolute',
+    top: statusBarHeight + 10,
+    right: 18,
+    zIndex: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: 18,
+    padding: 2,
+    elevation: 3,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+  },
+  menuContainer: {
+    width: 270,
+    backgroundColor: COLORS.white,
+    paddingTop: 40,
+    paddingHorizontal: 18,
+    paddingBottom: 24,
+    borderTopLeftRadius: 18,
+    borderBottomLeftRadius: 18,
+    elevation: 8,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+  },
+  menuCloseBtn: {
+    alignSelf: 'flex-end',
+    marginBottom: 8,
+  },
+  menuProfileSection: {
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  menuProfileName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginTop: 6,
+    marginBottom: 10,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.cardBorder,
+  },
+  menuItemIcon: {
+    marginRight: 14,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
   animatedSearchBox: {
     position: 'absolute',
     left: 0,
@@ -496,8 +913,8 @@ const styles = StyleSheet.create({
   },
   inputFluid: {
     flex: 1,
-    backgroundColor: COLORS.modalBg,
-    borderRadius: 12,
+    backgroundColor: COLORS.white,
+    borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
