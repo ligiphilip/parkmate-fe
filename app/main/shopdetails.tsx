@@ -70,21 +70,21 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#43AA8B',
+    backgroundColor: '#2c2455',
     paddingTop: 44,
     paddingBottom: 16,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
     elevation: 4,
-    shadowColor: '#43AA8B',
+    shadowColor: '#2c2455',
     shadowOpacity: 0.08,
   },
   backBtn: {
     marginRight: 12,
     padding: 4,
     borderRadius: 20,
-    backgroundColor: '#43AA8B',
+    backgroundColor: '#2c2455',
   },
   shopTitle: {
     fontSize: 20,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#518048',
+    color: '#2c2455',
     marginTop: 18,
     marginBottom: 8,
   },
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
   itemPrice: {
     fontSize: 15,
-    color: '#43AA8B',
+    color: '#2c2455',
     fontWeight: 'bold',
     marginLeft: 8,
   },

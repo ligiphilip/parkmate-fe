@@ -17,6 +17,7 @@ import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import { Share } from 'react-native';
 import { Colors } from '@/constants/Colors';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -82,6 +83,7 @@ const MOCK_SHOPS = [
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function ShopSearch() {
+  const { theme, toggleTheme } = useThemeMode();
   // Share App logic
   const shareApp = async () => {
     try {
@@ -115,6 +117,14 @@ export default function ShopSearch() {
   const [profileGender, setProfileGender] = useState('');
   const [profileDOB, setProfileDOB] = useState('');
   const [profileEmail, setProfileEmail] = useState('your@email.com');
+  // Favorite shops state
+  const [favoriteShopIds, setFavoriteShopIds] = useState<string[]>([]);
+
+  const toggleFavorite = (shopId: string) => {
+    setFavoriteShopIds((prev) =>
+      prev.includes(shopId) ? prev.filter((id) => id !== shopId) : [...prev, shopId]
+    );
+  };
   const searchAnim = useRef(new Animated.Value(0)).current; // 0=center, 1=top
   const router = useRouter();
 
@@ -247,16 +257,19 @@ export default function ShopSearch() {
   const renderShop = ({ item }: { item: typeof MOCK_SHOPS[0] }) => (
     <View style={styles.card}>
       <TouchableOpacity style={styles.cardTouch} activeOpacity={0.85} onPress={() => openShopDetails(item)}>
-        <ShopImageSlider images={item.images} />
+        {/* Header with shop name and image */}
+        <View style={styles.cardHeader}>
+          {/* Shop image thumbnail on the right */}
+          <Image
+            source={{ uri: item.images[0] }}
+            style={styles.shopImageThumbnail}
+          />
+          <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+              <Ionicons name="storefront-outline" size={16} color={COLORS.shopName} style={{ marginRight: 6 }} />
+              <Text style={styles.shopName}>{item.name}</Text>
+            </View>
         <View style={styles.cardContent}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
-            <Ionicons name="storefront-outline" size={16} color={COLORS.shopName} style={{ marginRight: 6 }} />
-            <Text style={styles.shopName}>{item.name}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
-            <Ionicons name="pricetag-outline" size={15} color={COLORS.shopCategory} style={{ marginRight: 6 }} />
-            <Text style={styles.shopCategory}>{item.category}</Text>
-          </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
             <Ionicons name="location-outline" size={15} color={COLORS.shopAddress} style={{ marginRight: 6 }} />
             <Text style={styles.shopAddress}>{item.address}</Text>
@@ -266,21 +279,41 @@ export default function ShopSearch() {
             <Text style={styles.shopDistance}>{item.distance} 2KM Away</Text>
           </View>
         </View>
+          </View>
+          
+        </View>
+        
+        
       </TouchableOpacity>
       <View style={styles.actionRow}>
         <TouchableOpacity style={styles.bookBtn} onPress={() => openBookingModal(item)}>
           <Ionicons name="car-outline" size={18} style={styles.actionBtnIcon} />
-          <Text style={styles.bookBtnText}>Book</Text>
+          <Text style={styles.actionBtnText}>Live Status</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bookBtn} onPress={() => openBookingModal(item)}>
+          <Ionicons name="car-outline" size={18} style={styles.actionBtnIcon} />
+          <Text style={styles.actionBtnText}>Book</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.locateBtn} onPress={() => alert('Show Google Map and locate me')}>
           <Ionicons name="location-outline" size={18} style={styles.actionBtnIcon} />
-          <Text style={styles.actionBtnText}>Locate Me</Text>
+          <Text style={styles.actionBtnText}>Locate</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.chatBtn} onPress={() => alert(`Chat with ${item.name}`)}>
           <Ionicons name="chatbubbles-outline" size={18} style={styles.actionBtnIcon} />
           <Text style={styles.actionBtnText}>Chat</Text>
         </TouchableOpacity>
       </View>
+      {/* Favorite button positioned at top-right */}
+      <TouchableOpacity 
+        onPress={() => toggleFavorite(item.id)} 
+        style={styles.favoriteButton}
+      >
+        <Ionicons
+          name={favoriteShopIds.includes(item.id) ? 'heart' : 'heart-outline'}
+          size={22}
+          color={favoriteShopIds.includes(item.id) ? COLORS.primary : COLORS.grayText}
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -295,7 +328,10 @@ export default function ShopSearch() {
         onRequestClose={() => setMenuVisible(false)}
       >
         <View style={styles.menuOverlay}>
-          <View style={styles.menuContainer}>
+          <View style={[
+            styles.menuContainer,
+            { backgroundColor: theme === 'dark' ? '#232136' : COLORS.white }
+          ]}>
             <TouchableOpacity style={styles.menuCloseBtn} onPress={() => setMenuVisible(false)}>
               <Ionicons name="close" size={28} color={COLORS.primary} />
             </TouchableOpacity>
@@ -308,11 +344,11 @@ export default function ShopSearch() {
               <Text style={{ fontWeight: 'bold', color: COLORS.grayText, fontSize: 13, marginBottom: 2, marginLeft: 2 }}>Account</Text>
               <TouchableOpacity style={styles.menuItem} onPress={() => setEditProfileModalVisible(true)}>
                 <Ionicons name="create-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>Edit Profile</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>Edit Profile</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={() => alert('Logout')}>
                 <Ionicons name="log-out-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>Logout</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>Logout</Text>
               </TouchableOpacity>
             </View>
             {/* Divider */}
@@ -325,20 +361,20 @@ export default function ShopSearch() {
               {/* About Us menu item (single instance) */}
               <TouchableOpacity style={styles.menuItem} onPress={() => setAboutModalVisible(true)}>
                 <Ionicons name="information-circle-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>About Us</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>About Us</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.menuItem} onPress={shareApp}>
                 <Ionicons name="share-social-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>Share App</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>Share App</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.menuItem} onPress={() => setContactModalVisible(true)}>
                 <Ionicons name="call-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>Contact Us</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>Contact Us</Text>
               </TouchableOpacity>
               {/* Dark Theme toggle with switch */}
               <View style={[styles.menuItem, { borderBottomWidth: 0, paddingVertical: 8 }]}> 
                 <Ionicons name="moon-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>Dark Theme</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>Dark Theme</Text>
                 <View style={{ flex: 1, alignItems: 'flex-end' }}>
                   <TouchableOpacity
                     style={{
@@ -349,15 +385,15 @@ export default function ShopSearch() {
                       justifyContent: 'center',
                       padding: 2,
                     }}
-                    onPress={() => alert('Dark Theme toggled!')}
+                    onPress={toggleTheme}
                   >
                     <Animated.View
                       style={{
                         width: 20,
                         height: 20,
                         borderRadius: 10,
-                        backgroundColor: COLORS.primary,
-                        transform: [{ translateX: 0 }],
+                        backgroundColor: theme === 'dark' ? '#fff' : COLORS.primary,
+                        transform: [{ translateX: theme === 'dark' ? 20 : 0 }],
                       }}
                     />
                   </TouchableOpacity>
@@ -369,7 +405,7 @@ export default function ShopSearch() {
             <View style={{ marginTop: 40 }}>
               <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={() => setDeleteModalVisible(true)}>
                 <Ionicons name="trash-outline" size={22} color={COLORS.primary} style={styles.menuItemIcon} />
-                <Text style={styles.menuItemText}>Delete Account</Text>
+                <Text style={[styles.menuItemText, {color: theme === 'dark' ? '#fff' : COLORS.primary}]}>Delete Account</Text>
               </TouchableOpacity>
             </View>
       {/* Delete Account Confirmation Modal */}
@@ -572,7 +608,14 @@ export default function ShopSearch() {
           </View>
         </View>
       </Modal>
+    {/* Welcome Content (hide when searching) */}
+      {!searchActive && (
+        <View style={styles.welcomeContent}>
 
+          <Text style={styles.welcomeTitle}>Welcome to ParkMate!</Text>
+          <Text style={styles.welcomeSubtitle}>Find the best shops and parking spots nearby.</Text>
+        </View>
+      )}
       {/* Top Row: Search Box and Profile Icon */}
       <Animated.View
         style={[
@@ -593,9 +636,21 @@ export default function ShopSearch() {
           },
         ]}
       >
-        <View style={styles.inputRow}>
+        <Animated.View
+          style={
+            [
+              styles.inputRow,
+              {
+                marginRight: searchAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 56], // 0 when centered, 56 when at top
+                })
+              }
+            ]
+          }
+        >
           <TextInput
-            style={styles.inputFluid}
+            style={styles.inputFluidMainSearch}
             placeholder="Search shops, categories, or address..."
             placeholderTextColor={COLORS.placeholder}
             value={query}
@@ -603,7 +658,7 @@ export default function ShopSearch() {
             clearButtonMode="while-editing"
             onFocus={() => setSearchActive(true)}
           />
-        </View>
+        </Animated.View>
       </Animated.View>
 
       {/* Profile Icon - always top right */}
@@ -615,14 +670,7 @@ export default function ShopSearch() {
         <Ionicons name="person-circle" size={36} color={COLORS.primary} />
       </TouchableOpacity>
 
-      {/* Welcome Content (hide when searching) */}
-      {!searchActive && (
-        <View style={styles.welcomeContent}>
-
-          <Text style={styles.welcomeTitle}>Welcome to ParkMate!</Text>
-          <Text style={styles.welcomeSubtitle}>Find the best shops and parking spots nearby.</Text>
-        </View>
-      )}
+  
 
       {/* Shop List (show only when searching and query is not empty) */}
       {searchActive && query.trim().length > 0 && (
@@ -651,7 +699,7 @@ export default function ShopSearch() {
           <View style={styles.modalContent}>
             {bookingStep === 'date' && (
               <>
-                <Text style={styles.modalTitle}>Select Date</Text>
+                <Text style={styles.modalTitle}>Select Day</Text>
                 <View style={styles.modalRow}>
                   <Pressable
                     style={[styles.modalBtn, selectedDate === 'today' && styles.modalBtnActive]}
@@ -701,7 +749,10 @@ export default function ShopSearch() {
 // Centralized color palette
 const COLORS = {
   cancelText: "#9E9E9E", // Soft gray
-  primary: "#43AA8B", // Electric blue
+  primary: "#2c2455", // Electric blue
+  buttonBg: "#E0E0E0", // Electric blue
+  borderColor: "#B0B0B0",
+  black:"#000000",
   secondary: "#518048", // Bright cyan
   border: "#4D908E", // Electric blue
   shadow: "#518048", // Blue tint
@@ -715,11 +766,11 @@ const COLORS = {
   modalBtnActiveBg: "#E95555", // Electric blue
   modalBtnActiveBorder: "#E56B6B", // Electric blue
   shopImageBg: "#E3F2FD", // Light blue
-  shopName: "#90BE6D", // Electric blue
-  shopCategory: "#90BE6D", // Purple
-  shopAddress: "#90BE6D", // Gray
-  shopPhone: "#CDD993", // Electric blue
-  shopRating: "#90BE6D", // Purple
+  shopName: "#2c2455", // Electric blue
+  shopCategory: "#2c2455", // Purple
+  shopAddress: "#2c2455", // Gray
+  shopPhone: "#2c2455", // Electric blue
+  shopRating: "#2c2455", // Purple
   noResults: "#888888", // Gray
   modalOverlay: 'rgba(0,0,0,0.2)', // Modal overlay background
   placeholder: '#aaa', // Placeholder text color
@@ -739,6 +790,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
+    marginRight: 56, // Leave space for the fixed profile icon (36px icon + padding)
   },
   profileIconBtn: {
     // No longer used
@@ -759,7 +811,7 @@ const styles = StyleSheet.create({
   },
   profileIconFixed: {
     position: 'absolute',
-    top: statusBarHeight + 10,
+    top: statusBarHeight + 18,
     right: 18,
     zIndex: 20,
     backgroundColor: COLORS.white,
@@ -845,7 +897,7 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: COLORS.secondary,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -879,23 +931,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     elevation: 4,
   },
-  locateBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.grayText,
-    borderRadius: 3,
-    paddingVertical: 2,
-    paddingHorizontal: 5,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: COLORS.grayText, // blue-cyan
-    justifyContent: 'center',
-    minWidth: 0,
-    shadowColor: COLORS.grayText,
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    marginRight: 8,
-  },
+
   headerFluidRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -919,6 +955,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 2,
+    color: COLORS.textInput,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  inputFluidMainSearch: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderWidth: 0,
     borderColor: COLORS.border,
     marginBottom: 2,
     color: COLORS.textInput,
@@ -982,14 +1034,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: COLORS.cardBg,
     borderRadius: 3,
-    marginBottom: 5,
+    marginBottom: 10,
+    marginTop:5,
     padding: 10,
     // Modern soft shadow (iOS & Android)
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.18,
     shadowRadius: 24,
-    elevation: 5,
+    elevation: 3,
     alignItems: 'center',
     position: 'relative',
     borderWidth: 0,
@@ -1003,22 +1056,34 @@ const styles = StyleSheet.create({
     marginTop: 10,
     gap: 8,
   },
-  bookBtn: {
+    locateBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.buttonBg,
     borderRadius: 3,
-    paddingVertical: 2,
-    paddingHorizontal: 5,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-    marginRight: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 9,
+    elevation: 0,
+ 
+    color:COLORS.black,
     justifyContent: 'center',
     minWidth: 0,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
+    marginRight: 3,
+  },
+  bookBtn: {
+   flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.buttonBg,
+    borderRadius: 3,
+    paddingVertical: 6,
+    paddingHorizontal: 9,
+    elevation: 0,
+    //borderWidth: 1,
+   // borderColor: COLORS.borderColor,
+    color: COLORS.black,
+    justifyContent: 'center',
+    minWidth: 0,
+    marginRight: 3,
   },
   bookBtnText: {
     color: COLORS.white,
@@ -1028,27 +1093,26 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   chatBtn: {
-    flexDirection: 'row',
+   flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.shopRating,
+    backgroundColor: COLORS.buttonBg,
     borderRadius: 3,
-    paddingVertical: 2,
-    paddingHorizontal: 5,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: COLORS.shopRating, // green
+    paddingVertical: 6,
+    paddingHorizontal: 9,
+    elevation: 0,
+ 
+    color: COLORS.black,
+    
     justifyContent: 'center',
     minWidth: 0,
-    shadowColor: COLORS.shopRating,
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    marginRight: 3,
   },
   actionBtnIcon: {
     marginRight: 4,
-    color: COLORS.white,
+    color: COLORS.black,
   },
   actionBtnText: {
-    color: COLORS.white,
+    color: COLORS.black,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 0.5,
@@ -1061,9 +1125,9 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: COLORS.modalBg,
-    borderRadius: 18,
+    borderRadius: 5,
     padding: 28,
-    width: 320,
+    width: "90%",
     alignItems: 'center',
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
@@ -1087,10 +1151,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.modalBtnBg,
     borderRadius: 8,
     paddingVertical: 12,
-    paddingHorizontal: 18,
+    paddingHorizontal: 10,
     marginHorizontal: 6,
     borderWidth: 1,
-    borderColor: COLORS.modalBtnActiveBorder,
+    borderColor: COLORS.primary,
   },
   modalBtnActive: {
     backgroundColor: COLORS.modalBtnActiveBg,
@@ -1138,20 +1202,20 @@ const styles = StyleSheet.create({
   shopName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: COLORS.secondary,
+    color: COLORS.primary,
     marginBottom: 2,
     letterSpacing: 0.2,
   },
   shopCategory: {
     fontSize: 14,
-    color: COLORS.secondary,
+    color: COLORS.primary,
     marginBottom: 2,
     fontWeight: '600',
     letterSpacing: 0.2,
   },
   shopAddress: {
     fontSize: 13,
-    color: COLORS.secondary,
+    color: COLORS.primary,
     marginBottom: 4,
   },
   row: {
@@ -1179,5 +1243,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.shopName,
     marginBottom: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+    width: '100%',
+  },
+  shopImageThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.shopImageBg,
+    resizeMode: 'cover',
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    marginRight:10
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    padding: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 15,
   },
 });
