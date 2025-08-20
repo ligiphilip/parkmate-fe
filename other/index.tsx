@@ -64,11 +64,11 @@ export default function LoginScreen() {
 
   // Theme colors
   // Qodo color theme
-   const qodoSecondary = '#43AA8B'; // bright cyan
-  const qodoBg = '#43AA8B'; // deep dark
-  const qodoCard = '#43AA8B'; // slightly lighter dark
-   const qodoText = '#FFFFFF'; // white
- 
+  const qodoSecondary = '#2c2455'; // bright cyan
+  const qodoBg = '#2c2455'; // deep dark
+  const qodoCard = '#2c2455'; // slightly lighter dark
+  const qodoText = '#FFFFFF'; // white
+
   const isDark = true; // Force qodo theme for now
   const bgColor = qodoBg;
   const cardBg = qodoCard;
@@ -80,7 +80,7 @@ export default function LoginScreen() {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={toggleTheme} style={{ marginRight: 16 }}>
-          <Text style={{ fontSize: 18 }}>{isDark ? '☀️' : '🌙' }</Text>
+          <Text style={{ fontSize: 18 }}>{isDark ? '☀️' : '🌙'}</Text>
         </TouchableOpacity>
       ),
     });
@@ -116,7 +116,21 @@ export default function LoginScreen() {
             maxLength={10}
           />
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <Button title="Send OTP" onPress={sendOtp} />
+          <TouchableOpacity
+            style={[
+              styles.modalBtn,
+              { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#3F3B49', borderColor: '#51513D', marginTop: 8 }
+            ]}
+            onPress={sendOtp}
+            activeOpacity={0.85}
+          >
+            <Text style={[styles.modalBtnText, { color: '#fff', fontWeight: 'bold', fontSize: 16, marginRight: 6 }]}>Send OTP</Text>
+            <View style={{ marginLeft: 2 }}>
+              {/* Ionicons vector icon for consistency */}
+              <Text style={{ color: '#fff', fontSize: 18 }}>🔒</Text>
+            </View>
+          </TouchableOpacity>
+  
         </View>
       </View>
     </SafeAreaView>
@@ -138,12 +152,7 @@ const styles = StyleSheet.create({
     maxWidth: 400, // Tab width
     paddingVertical: 100,
     paddingHorizontal: 36,
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 12,
+
     alignSelf: 'center',
     justifyContent: 'center',
   },
@@ -160,11 +169,32 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     borderRadius: 10,
     fontSize: 18,
+    backgroundColor:'#ffffff'
   },
   errorText: {
     color: 'red',
     marginBottom: 14,
     fontSize: 14,
+    textAlign: 'center',
+  },
+  modalBtn: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: '#3F3B49',
+    marginBottom: 2,
+    marginTop: 8,
+    shadowColor: '#3F3B49',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  modalBtnText: {
+    fontSize: 16,
+    color: '#263238',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
 });
